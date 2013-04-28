@@ -7,8 +7,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,14 +35,10 @@ import org.myahya.prayertimes.PrayerTimes;
  */
 public class PrayerTimeProvider {
 
-  URI prayerFileUri;
+  File prayerFile;
 
   public PrayerTimeProvider(File file) {
-    this.prayerFileUri = file.toURI();
-  }
-
-  public PrayerTimeProvider(URI uri) {
-    this.prayerFileUri = uri;
+    this.prayerFile = file;
   }
 
   /** Locale used in file for month names, years */
@@ -59,8 +53,6 @@ public class PrayerTimeProvider {
 
   /**
    * Prayer times for a specific day.
-   * 
-   * @throws IOException
    */
   public PrayerTimes getPrayerTimes(Date date) {
     return getPrayerTimesForDate(date);
@@ -86,9 +78,7 @@ public class PrayerTimeProvider {
 
     int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 
-    File f = new File(prayerFileUri);
-
-    BufferedReader br = new BufferedReader(new FileReader(f));
+    BufferedReader br = new BufferedReader(new FileReader(prayerFile));
     String line = null;
 
     while ((line = br.readLine()) != null) {
@@ -118,7 +108,7 @@ public class PrayerTimeProvider {
 
     System.out.println(Arrays.asList(lineParts));
 
-    for (int i = 1; i < PrayerTimes.NUMBER_PRAYER_TIMES+1; i++) {
+    for (int i = 1; i < PrayerTimes.NUMBER_PRAYER_TIMES + 1; i++) {
       String time = lineParts[i].trim();
 
       Calendar cal = new GregorianCalendar();
@@ -133,24 +123,14 @@ public class PrayerTimeProvider {
     return new PrayerTimes(prayerTimes);
   }
 
-  private void close() {
-
-    // if(prayerFileUri)
-
-  }
-
   /**
    * Example usage
    */
   public static void main(String[] args) {
 
     PrayerTimeProvider ptp = null;
-    try {
-      ptp = new PrayerTimeProvider(new URI(
-          "file:///home/myahya/Desktop/Saarbruecken.txt"));
-    } catch (URISyntaxException e) {
-      System.err.print("Cannot open specified URI.");
-    }
+    ptp = new PrayerTimeProvider(new File(
+        "file:///home/myahya/Desktop/Saarbruecken.txt"));
 
     System.out.println(ptp.getPrayerTimes());
 
